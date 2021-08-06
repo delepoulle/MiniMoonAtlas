@@ -1,0 +1,7 @@
+version: "3.1"
+services:
+    minimoonatlas:
+        container_name: minimoonatlas_instance
+        build: .
+        ports:
+            - "9999:9999"

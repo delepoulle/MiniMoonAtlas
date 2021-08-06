@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>My first three.js app</title>
+		<style>
+			body { margin: 0; }
+		</style>
+	</head>
+	<body>
+        <script src="js/three.js"></script>
+		<script>
+			// Our Javascript will go here.
+            const scene = new THREE.Scene();
+            //scene.background = new THREE.Color( 0xffffff );
+            const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+
+            // lumière directionnelle
+            const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
+            directionalLight.position.set(1,0,0);
+            scene.add( directionalLight );
+
+            // lumière ambiante
+            var light2 = new THREE.AmbientLight(0x444444);
+	        scene.add( light2 );
+
+            var sphereGeom =  new THREE.SphereGeometry( 1, 32, 32 ); 
+            var loader = new THREE.TextureLoader();
+            var texture = loader.load( './images/lroc_color_poles_4k.png' );
+            
+            moonMaterial = new THREE.MeshPhongMaterial( { map: texture ,opacity: 0.8, shininess: 0, transparent: true } );
+
+            moonMaterial.bumpMap    = THREE.ImageUtils.loadTexture('./images/ldem_16_uint.png')
+            moonMaterial.bumpScale = 0.05
+
+
+            material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+            var moon = new THREE.Mesh( sphereGeom, moonMaterial );
+
+            scene.add( moon );  
+
+            camera.position.z = 2;
+
+            function animate() {
+                moon.rotation.y += 0.01;
+                requestAnimationFrame( animate );
+                renderer.render( scene, camera );
+            }
+            animate();
+		</script>
+	</body>
+</html>
