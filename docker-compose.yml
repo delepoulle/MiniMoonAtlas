@@ -3,5 +3,11 @@ services:
     minimoonatlas:
         container_name: minimoonatlas_instance
         build: .
-        ports:
-            - "9999:9999"
+        networks:
+            - web
+    labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jrcan.rule=Host(`atlas.ltdle.netlib.re`)"
+        - "traefik.http.routers.jrcan.entrypoints=websecure"
+    restart: always
+    
