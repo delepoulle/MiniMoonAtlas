@@ -5,9 +5,12 @@ services:
         build: .
         networks:
             - web
-    labels:
-        - "traefik.enable=true"
-        - "traefik.http.routers.jrcan.rule=Host(`atlas.ltdle.netlib.re`)"
-        - "traefik.http.routers.jrcan.entrypoints=websecure"
-    restart: always
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.jrcan.rule=Host(`atlas.ltdle.netlib.re`)"
+            - "traefik.http.routers.jrcan.entrypoints=websecure"
+        restart: always
     
+networks:
+  web:
+    external: true
