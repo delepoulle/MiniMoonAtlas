@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "lunarphase-js": "^1.0.8",
     "three": "^0.131.3"
   },
   "description": ""
