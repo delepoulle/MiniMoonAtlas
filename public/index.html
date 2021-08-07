@@ -8,14 +8,23 @@
 		</style>
 	</head>
 	<body>
-        <script src="js/three.js"></script>
-		<script>
+		<script type="module">
+            import * as THREE from '/build/three.module.js';
+            import { GUI } from './jsm/libs/dat.gui.module.js';
+
+            var params = {
+				speed: 0.005 ,
+                stop: function() {
+                    this.speed = 0;
+                }
+			};
+
 			// Our Javascript will go here.
             const scene = new THREE.Scene();
             //scene.background = new THREE.Color( 0xffffff );
             const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 
-            const renderer = new THREE.WebGLRenderer();
+            const renderer = new THREE.WebGLRenderer( { antialias: true } );
             renderer.setSize( window.innerWidth, window.innerHeight );
             document.body.appendChild( renderer.domElement );
 
@@ -30,15 +39,15 @@
 
             var sphereGeom =  new THREE.SphereGeometry( 1, 32, 32 ); 
             var loader = new THREE.TextureLoader();
-            var texture = loader.load( './images/lroc_color_poles_4k.png' );
+            var texture = loader.load('images/lroc_color_poles_4k.png' );
             
-            moonMaterial = new THREE.MeshPhongMaterial( { map: texture ,opacity: 0.8, shininess: 0, transparent: true } );
+            var moonMaterial = new THREE.MeshPhongMaterial( { map: texture ,opacity: 0.8, shininess: 0, transparent: true } );
 
-            moonMaterial.bumpMap    = THREE.ImageUtils.loadTexture('./images/ldem_16_uint.png')
+            moonMaterial.bumpMap    = loader.load('images/ldem_16_uint.png')
             moonMaterial.bumpScale = 0.05
 
 
-            material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+            var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
             var moon = new THREE.Mesh( sphereGeom, moonMaterial );
 
             scene.add( moon );  
@@ -46,11 +55,17 @@
             camera.position.z = 2;
 
             function animate() {
-                moon.rotation.y += 0.001;
+                moon.rotation.y += params.speed;
                 requestAnimationFrame( animate );
                 renderer.render( scene, camera );
             }
             animate();
+
+            var gui = new GUI();
+
+            gui.add(params, 'speed', -0.02, 0.02).name('speed').listen();
+            gui.add(params, 'stop');
+
 		</script>
 	</body>
 </html>
