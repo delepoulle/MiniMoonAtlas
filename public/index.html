@@ -3,49 +3,68 @@
 	<head>
 		<meta charset="utf-8">
 		<title>MMA - Mini Moon Atlas</title>
+        <link type="text/css" rel="stylesheet" href="main.css">
 		<style>
 			body { margin: 0; }
 		</style>
+
 	</head>
 	<body>
+        <div id="container"></div>
+
+		<div id="info">
+			Mini Moon Atlas using  <a href="https://threejs.org/" target="_blank" rel="noopener">three.js</a>, high quality texture from <a href="https://svs.gsfc.nasa.gov/index.html" target="_blank" rel="noopener">NASA Scientific Visualisation Studio</a><br/>
+			Source code <a href="https://github.com/delepoulle/MiniMoonAtlas" target="_blank" rel="noopener">https://github.com/delepoulle/MiniMoonAtlas</a>.
+            <br/>
+        </div>
+
 		<script type="module">
 
             import * as THREE from '/build/three.module.js';
             import { GUI } from './jsm/libs/dat.gui.module.js';
+        
+            import { Moon } from './lunarphase/lunarphase-js.esm.js';
+
+            
+            var phase = .5;
+            
 
             var params = {
-				speed: 0.005 ,
+				speed: 0.000 ,
+                phase: .5,
                 stop: function() {
                     this.speed = 0;
-                }
+                },
+                today: true,
 			};
 
 			// Our Javascript will go here.
             const scene = new THREE.Scene();
             //scene.background = new THREE.Color( 0xffffff );
-            const camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-
+            const camera = new THREE.PerspectiveCamera( 0.5 , window.innerWidth / window.innerHeight, 0.1, 1000 );
             const renderer = new THREE.WebGLRenderer( { antialias: true } );
             renderer.setSize( window.innerWidth, window.innerHeight );
             document.body.appendChild( renderer.domElement );
 
             // lumière directionnelle
-            const directionalLight = new THREE.DirectionalLight( 0xffffff, 2 );
-            directionalLight.position.set(1,0,0);
+            const directionalLight = new THREE.DirectionalLight( 0xffffff, 1.5 );
+            var x = Math.sin(params.phase*Math.PI*2.0);
+            var z = - Math.cos(params.phase*Math.PI*2.0)
+            directionalLight.position.set(x,0,z);
             scene.add( directionalLight );
 
             // lumière ambiante
             var light2 = new THREE.AmbientLight(0x444444);
-	        scene.add( light2 );
+	        //scene.add( light2 );
 
             var sphereGeom =  new THREE.SphereGeometry( 1, 32, 32 ); 
             var loader = new THREE.TextureLoader();
             var texture = loader.load('images/lroc_color_poles_4k.png' );
-            
-            var moonMaterial = new THREE.MeshPhongMaterial( { map: texture ,opacity: 0.8, shininess: 0, transparent: true } );
+
+            var moonMaterial = new THREE.MeshPhongMaterial( { map: texture , opacity: 1.0, shininess: 0, transparent: true } );
 
             moonMaterial.bumpMap    = loader.load('images/ldem_16_uint.png')
-            moonMaterial.bumpScale = 0.05
+            moonMaterial.bumpScale = 0.02
 
 
             var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -53,7 +72,8 @@
 
             scene.add( moon );  
 
-            camera.position.z = 2;
+            camera.position.z = 300;
+            moon.rotation.y = -90.0/180.0*Math.PI;
 
             function animate() {
                 moon.rotation.y += params.speed;
@@ -64,9 +84,41 @@
 
             var gui = new GUI();
 
-            gui.add(params, 'speed', -0.02, 0.02).name('speed').listen();
-            gui.add(params, 'stop');
+            // gui.add( params, 'clipIntersection' ).name( 'clip intersection' ).onChange( function ( value ) {
+
+            //     console.log("lock")
+
+            // }
+
+
+
+
+            var obj = { today:function(){
+                params.phase = Moon.lunarAgePercent(new Date());
+                console.log(params.phase);
+                var x = Math.sin(params.phase*Math.PI*2.0);
+                var z = - Math.cos(params.phase*Math.PI*2.0)
+                directionalLight.position.set(x,0,z);
+
+                for (var i in gui.__controllers) {
+                    gui.__controllers[i].updateDisplay();
+                }
+
+            }};
+
+            gui.add(obj,'today');
+
+            gui.add(params, 'phase', 0, 1.0).name('phase').onChange( function() {
+                var x = Math.sin(params.phase*Math.PI*2.0);
+                var z = - Math.cos(params.phase*Math.PI*2.0)
+                directionalLight.position.set(x,0,z);
+            });
+
+            
+            
 
 		</script>
+
+            
 	</body>
 </html>
