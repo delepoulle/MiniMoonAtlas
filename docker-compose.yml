@@ -1,16 +1,15 @@
 version: "3.1"
 services:
     minimoonatlas:
-        container_name: minimoonatlas_instance
+        container_name: ${NAME}
         build: .
-        ports:
-            - 9999:9999
         networks:
             - web
         labels:
             - "traefik.enable=true"
-            - "traefik.http.routers.minimoonatlas.rule=Host(`atlas.ltdle.netlib.re`)"
-            - "traefik.http.routers.minimoonatlas.entrypoints=websecure"
+            - "traefik.http.routers.${NAME}.rule=Host(`${NAME}.jrcandev.netlib.re`)"
+            - "traefik.http.routers.${NAME}.entrypoints=websecure"
+            - "traefik.http.routers.${NAME}.tls.certresolver=lets-encrypt"
         restart: always
     
 networks:
